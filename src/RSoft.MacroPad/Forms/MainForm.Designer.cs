@@ -58,7 +58,7 @@
             // 
             // splitContainer1
             // 
-            splitContainer1.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
+            splitContainer1.Dock = System.Windows.Forms.DockStyle.Fill;
             splitContainer1.Location = new System.Drawing.Point(0, 75);
             splitContainer1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             splitContainer1.Name = "splitContainer1";
@@ -241,9 +241,9 @@
             AutoScaleDimensions = new System.Drawing.SizeF(13F, 32F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             ClientSize = new System.Drawing.Size(1978, 2086);
+            Controls.Add(splitContainer1);
             Controls.Add(statusStrip1);
             Controls.Add(menuStrip1);
-            Controls.Add(splitContainer1);
             MainMenuStrip = menuStrip1;
             Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             MinimumSize = new System.Drawing.Size(1922, 1138);
