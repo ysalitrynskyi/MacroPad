@@ -6,7 +6,8 @@
 // Format:
 //	{VendorId}:{ProductId},{PathFragment},{ProtocolVersion}
 //
-// ProtocolVersion can be 0 (Legacy) or 1 (Extended). apart from one device (the smallest one) all devices use the extended protocol
+// ProtocolVersion can be 0 (Legacy), 1 (Extended) or 2 (WebHub). apart from one device (the smallest one) all devices use the extended protocol
+// WebHub is used by the SDINNOVATION / SDCX / Huali pads, which the vendor configures with a browser based tool
 
 4489:34880,mi_01,1
 4489:34960,mi_01,0
@@ -15,3 +16,4 @@
 4489:34866,mi_00,1
 4489:34867,mi_00,1
 4489:34832,mi_00,1
+28027:56570,mi_02,2

@@ -151,6 +151,12 @@ namespace RSoft.MacroPad.Forms
                     reports = composer.Mouse(keyboardVisual1.SelectedAction, keyboardVisual1.Layer, keyboardFunction1.MouseButton, keyboardFunction1.MouseModifier);
                     break;
             }
+            if (!reports.Any())
+            {
+                lblCommStatus.Text = $"This function is not supported by the connected keypad [{DateTime.Now.ToString("T")}]";
+                return;
+            }
+
             bool success = true;
             HidLog.ClearLog();
             foreach (var report in reports)

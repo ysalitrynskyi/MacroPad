@@ -119,6 +119,13 @@ This file is a list supported devices, each is a single line
 
 ProtocolVersion can be 0 (Legacy) or 1 (Extended). Apart from one device (the 3 button 1 knob) all devices use the extended protocol
 
+ProtocolVersion 2 (WebHub) is for a different family of keypads: the SDINNOVATION / SDCX / Huali pads, which their vendor configures with a browser based WebHID tool. The SIDE-KEYBOARD (`28027:56570`, 3 buttons 1 knob) is configured this way out of the box. On these keypads
+- every key or knob action holds a single keystroke (with modifiers) or a media key
+- mouse functions are not supported
+- the LED tab sets the backlight effect (off, solid, breathing, blink, tide) and its color
+
+The WebHub protocol notes come from [Knurl](https://github.com/dozzenn/knurl), a macOS port of this app, and were verified here against a SIDE-KEYBOARD by writing mappings and reading them back.
+
 #### Adding your own
 Find your device in Windows' Device Manager:
 - `View` > `Devices by type`

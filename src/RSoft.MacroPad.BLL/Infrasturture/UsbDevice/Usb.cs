@@ -62,7 +62,12 @@ namespace RSoft.MacroPad.BLL.Infrasturture.UsbDevice
 
         protected void Connected()
         {
-            KeyBoardVersionCheck();
+            // WebHub firmware answers every frame and has a bootloader jump among its commands,
+            // so it is not sent probe frames it does not know
+            if (ProtocolType == ProtocolType.WebHub)
+                Version = 0;
+            else
+                KeyBoardVersionCheck();
             OnConnected?.Invoke(this, EventArgs.Empty);
         }
 

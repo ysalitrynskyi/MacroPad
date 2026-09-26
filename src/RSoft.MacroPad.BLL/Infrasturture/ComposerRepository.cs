@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using RSoft.MacroPad.BLL.Infrasturture.Model;
 using RSoft.MacroPad.BLL.Infrasturture.Protocol;
+using RSoft.MacroPad.BLL.Infrasturture.Protocol.WebHub;
 
 namespace RSoft.MacroPad.BLL.Infrasturture
 {
@@ -22,9 +23,13 @@ namespace RSoft.MacroPad.BLL.Infrasturture
             if (i != -1)
                 return _cache[i].Composer;
 
-            var result = type == ProtocolType.Legacy
-                ? (IReportComposer)new LegacyReportComposer(version)
-                : new ExtendedReportComposer(version);
+            IReportComposer result;
+            switch (type)
+            {
+                case ProtocolType.Legacy: result = new LegacyReportComposer(version); break;
+                case ProtocolType.WebHub: result = new WebHubReportComposer(); break;
+                default: result = new ExtendedReportComposer(version); break;
+            }
             _cache.Add((result, type, version));
             return result;
         }

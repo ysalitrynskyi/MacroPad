@@ -1,6 +1,7 @@
 ﻿using HidLibrary;
 using RSoft.MacroPad.BLL.Infrasturture.Model;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 namespace RSoft.MacroPad.BLL.Infrasturture.UsbDevice
@@ -10,6 +11,7 @@ namespace RSoft.MacroPad.BLL.Infrasturture.UsbDevice
         private bool _deviceStatus;
         private List<HidDevice> _deviceList = new List<HidDevice>();
         private HidDevice _hidDevice;
+        private WebHubTransport _webHub;
 
         public ProtocolType? ProtocolType { get; private set; }
 
@@ -30,9 +32,22 @@ namespace RSoft.MacroPad.BLL.Infrasturture.UsbDevice
                     {
                         if (hidDevice.DevicePath.IndexOf(supportedProduct.PathFragment) != -1)
                         {
+                            if (supportedProduct.ProtocolType == Model.ProtocolType.WebHub)
+                            {
+                                try
+                                {
+                                    _webHub = new WebHubTransport(hidDevice.DevicePath, hidDevice.Capabilities.OutputReportByteLength);
+                                }
+                                catch (IOException)
+                                {
+                                    continue;
+                                }
+                            }
+                            else
+                                hidDevice.OpenDevice();
+
                             _deviceList.Add(hidDevice);
                             _hidDevice = hidDevice;
-                            _hidDevice.OpenDevice();
                             //// Somehow this is not supported in .net6 but doesn't seem to make any difference
                             //_hidDevice.MonitorDeviceEvents = true;
 
@@ -55,12 +70,21 @@ namespace RSoft.MacroPad.BLL.Infrasturture.UsbDevice
             if (_hidDevice.IsConnected)
                 return true;
             _hidDevice.CloseDevice();
+            _webHub?.Dispose();
+            _webHub = null;
             _deviceStatus = false;
             return false;
         }
 
         public bool WriteDevice(byte reportId, byte[] buffer)
         {
+            if (_webHub != null)
+            {
+                var length = _hidDevice.Capabilities.OutputReportByteLength - 1;
+                HidLog.AppendMsg(reportId, buffer.Take(length));
+                return _webHub.Transfer(reportId, buffer) != null;
+            }
+
             var report = _hidDevice.CreateReport();
             report.ReportId = reportId;
 

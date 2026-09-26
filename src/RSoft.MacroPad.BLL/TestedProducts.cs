@@ -14,7 +14,8 @@ namespace RSoft.MacroPad.BLL
         /// </summary>
         private static (ushort VendorId, ushort ProductId)[] _values { get; } = new[] 
         {
-            (4489,34960) 
+            (4489,34960),
+            (28027,56570)
         }.Select(x => ((ushort)x.Item1,(ushort)x.Item2)).ToArray();
 
         /// <summary>
