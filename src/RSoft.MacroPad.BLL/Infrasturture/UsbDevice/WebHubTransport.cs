@@ -51,6 +51,9 @@ namespace RSoft.MacroPad.BLL.Infrasturture.UsbDevice
             var deadline = DateTime.UtcNow.AddMilliseconds(timeoutMs);
             try
             {
+                // Reports queued before this frame are answers to other programs' requests, or status the keypad
+                // pushes by itself (e.g. after a brightness key), never the answer to this one
+                HidD_FlushQueue(_stream.SafeFileHandle);
                 StartRead();
                 if (!_stream.WriteAsync(frame, 0, frame.Length).Wait(timeoutMs))
                     return null;
@@ -63,7 +66,7 @@ namespace RSoft.MacroPad.BLL.Infrasturture.UsbDevice
 
                     var reply = _readBuffer.Skip(1).Take(_pendingRead.Result - 1).ToArray();
                     _pendingRead = null;
-                    if (reply.Length > 0 && reply[0] == ReplyMarker)
+                    if (IsAnswerTo(data, reply))
                         return reply;
                     StartRead();
                 }
@@ -74,6 +77,25 @@ namespace RSoft.MacroPad.BLL.Infrasturture.UsbDevice
                 return null;
             }
         }
+
+        /// <summary>
+        /// An answer starts with 0xAA and repeats the sub-command, except the key table read (8), which is answered as 7.
+        /// Key table reads and key writes also echo the offset.
+        /// </summary>
+        private static bool IsAnswerTo(byte[] request, byte[] reply)
+        {
+            if (reply.Length < 5 || reply[0] != ReplyMarker)
+                return false;
+            var sub = request[1];
+            if (reply[1] != (sub == 8 ? 7 : sub))
+                return false;
+            if (sub == 8 || sub == 16)
+                return reply[3] == request[3] && reply[4] == request[4];
+            return true;
+        }
+
+        [DllImport("hid.dll", SetLastError = true)]
+        private static extern bool HidD_FlushQueue(SafeFileHandle device);
 
         // A read left over from a timed out transfer is reused while it is still waiting.
         // If it has completed meanwhile, it holds the late answer to an earlier frame and is dropped.
