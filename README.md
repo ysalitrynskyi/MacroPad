@@ -1,4 +1,66 @@
-# MacroPad
+# MacroPad — software for cheap Chinese USB macro keypads (Windows)
+
+A free, open-source replacement for the configuration tools that come with the small **USB macro keypads / mini keyboards** sold on AliExpress, Amazon, Temu and eBay: the 1–12 key pads with one to three rotary **knobs**, often listed as *"MINI KeyBoard"*, *"3 key 1 knob macro keyboard"*, *"one-handed programmable keypad"*, *"volume knob keypad"*, or the **SDINNOVATION SIDE-KEYBOARD**.
+
+Use it to put a keyboard shortcut, a media key, a mouse click or scroll, or an LED control on every key and every knob direction. The mapping is stored **in the keypad itself**, so the pad keeps working on any computer, with nothing running in the background.
+
+This is a fork of [rOzzy1987/MacroPad](https://github.com/rOzzy1987/MacroPad). Version 1.1 adds:
+
+- **SDINNOVATION / SDCX / Huali keypads** (the ones the vendor configures in a browser at sdcx-tech.com or huali-tech.com, or with `SDTech.Options`), including the **SIDE-KEYBOARD** (`VID 6D7B`, `PID DCFA`, three keys and one knob).
+- **What's on the keypad now:** the app reads every key's current setting back from the pad and confirms each upload.
+- **Scroll speed:** a knob turn or a key press can scroll 1–10 wheel steps.
+- **LED brightness and speed** for single-colour and animated effects, plus keys that change the keypad's own LEDs (brightness up/down, next effect, next colour, speed up/down).
+- A clearer window: labelled toolbar, numbered steps, and a picker for keys your keyboard doesn't have (F13–F24, keypad keys).
+- The community fixes that were waiting upstream: the window no longer collapses on normal-DPI screens (#44), mouse functions no longer crash (#28), a 4-key layout (#26), and the project is on .NET 8.
+
+## Download
+
+Get the latest build from **[Releases](https://github.com/ysalitrynskyi/MacroPad/releases/latest)**:
+
+- `MacroPad-<version>-win-x64-standalone.zip`: runs on any 64-bit Windows 10/11, with nothing else to install.
+- `MacroPad-<version>-win-net8.zip`: smaller, needs the [.NET 8 Desktop Runtime](https://dotnet.microsoft.com/download/dotnet/8.0) (Windows asks to install it on first start if it's missing).
+
+Unzip anywhere and run `RSoft.MacroPad.exe`. No installer, no driver.
+
+## Supported keypads
+
+The app finds the pad by its USB vendor and product id. Windows shows them in Device Manager → the keypad's *USB Input Device* → Details → Hardware Ids, as `VID_xxxx&PID_xxxx`.
+
+| USB id (hex) | In `config.txt` (decimal) | What it usually is | Protocol | Tested |
+|---|---|---|---|---|
+| `6D7B:DCFA` | `28027:56570` | SDINNOVATION **SIDE-KEYBOARD**, 3 keys + 1 knob | WebHub | yes, this fork |
+| `1189:8890` | `4489:34960` | "MINI KeyBoard", 3 keys + 1 knob (also a 4-key variant) | Legacy | yes, upstream |
+| `1189:8840` | `4489:34880` | Mini typewriter-style pad, 6 keys + 2 knobs | Extended | community |
+| `1189:8830`–`8833` | `4489:34864`–`34867` | 6/9/12 keys with 1–3 knobs | Extended | not verified |
+| `1189:8810` | `4489:34832` | Extended-protocol pads | Extended | not verified |
+
+Not listed? Add a line to `config.txt` (format below). Pads with only keyboard interfaces and no vendor-defined HID interface are configured some other way and can't be reached by any tool of this kind.
+
+## Quick start
+
+1. Plug in the keypad and start the app. The status bar turns green and the right layout is picked; for WebHub pads the panel on the right shows what every key does right now.
+2. Click a key in the picture, or a knob: its **centre** is the press, its **left and right sides** are the turns.
+3. Under *Key setup*, choose what it should do: record a shortcut (● then press the keys), pick one from the list (≡), choose a media key, a mouse action and its scroll speed, or set the LEDs.
+4. Click **Upload to keypad** (Ctrl+S). The status bar confirms what the key now does.
+
+### Common questions
+
+- **The bundled `MINI_KeyBoard.exe` doesn't find my pad, or is in Chinese.** This app replaces it. Check the USB id against the table above.
+- **Can the knob change the volume faster?** Not on the WebHub firmware: a media key entry has no repeat count (tested; one volume step per detent). The knob *can* scroll faster: set the Mouse tab's scroll speed.
+- **Can I dim the LEDs?** Yes, on WebHub pads: the LED tab's brightness slider works with a single colour. For the palette effects the pad cycles its own colours.
+- **Does it need admin rights or a driver?** No. It talks to the pad through the standard Windows HID driver.
+- **Mac or Linux?** This app is Windows-only. For macOS there is [Knurl](https://github.com/dozzenn/knurl).
+
+## Credits
+
+Original app by Mihály Rozovits ([rOzzy1987/MacroPad](https://github.com/rOzzy1987/MacroPad)), GPL-3.0. Community pull requests merged here are by akiijauto (#44), Ryan Bernstein (#28) and RyanWor (#26). The WebHub protocol notes come from [Knurl](https://github.com/dozzenn/knurl). The SIDE-KEYBOARD support, read-back, scroll speed and LED controls were added in this fork and verified on the hardware.
+
+---
+
+*The original project's guide follows.*
+
+## Original introduction
+
 So you've ordered a chinese macro keypad and the software supplied doesn't make any sense to you? That was my problem as well...
 
 ![image](https://github.com/rOzzy1987/MacroPad/assets/617600/adf5b698-9ba4-4060-ade0-1fb078cac21c)
@@ -6,12 +68,6 @@ So you've ordered a chinese macro keypad and the software supplied doesn't make 
 Enter the RSoft MacroPad!
 
 ![image](https://github.com/rOzzy1987/MacroPad/assets/617600/5fd74dc1-b420-4388-be8b-f427a05bedca)
-
-
-## Installation
-No need to install anything, just download and extract a [Release](https://github.com/rOzzy1987/MacroPad/releases)
-
-Alternatively you ca clone the repository, build and run.
 
 ## GUI
 The main funcitons of the GUI are displayed on the image below
@@ -148,4 +204,6 @@ Also please consider sharing
 Please note that I am but one single developer upset about the unfriendliness of the original software shipped with my keypad. My intention is to make good, usable software, but I did, do and will make mistakes. Theoretically this software may not cause any harm to your computer, or any peripherals whatsoever, but still: Use at your own risk!
 
 ## Contact me
+For this fork (SIDE-KEYBOARD / WebHub support, read-back, scroll speed, LED controls) open an issue at https://github.com/ysalitrynskyi/MacroPad/issues. For the original app:
+
 Drop a mail to rozovits.mihaly@gmail.com

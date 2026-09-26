@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MacroPad – free software for Chinese USB macro keypads with knobs (Windows)</title>
+<meta name="description" content="Free, open-source Windows configurator for cheap USB macro keypads and mini keyboards with knobs (MINI KeyBoard 1189:8890, SDINNOVATION SIDE-KEYBOARD 6D7B:DCFA, SDCX / Huali pads). Map shortcuts, media keys, mouse scroll speed and LED brightness; the mapping is stored in the keypad.">
+<meta name="keywords" content="macro keypad software, mini keyboard software, 3 key 1 knob macro keyboard, MINI KeyBoard driver, MINI_KeyBoard.exe alternative, SIDE-KEYBOARD, SDINNOVATION, SDCX, huali-tech, sdcx-tech, 1189:8890, 6D7B:DCFA, AliExpress macro pad, programmable keypad knob, volume knob keypad">
+<link rel="canonical" href="https://ysalitrynskyi.github.io/MacroPad/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="MacroPad – software for Chinese USB macro keypads">
+<meta property="og:description" content="Configure cheap USB macro keypads and knobs on Windows: shortcuts, media keys, scroll speed, LED brightness. Supports the SDINNOVATION SIDE-KEYBOARD and MINI KeyBoard pads.">
+<meta property="og:url" content="https://ysalitrynskyi.github.io/MacroPad/">
+<meta property="og:image" content="https://ysalitrynskyi.github.io/MacroPad/screenshot.png">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "MacroPad",
+  "applicationCategory": "UtilitiesApplication",
+  "operatingSystem": "Windows 10, Windows 11",
+  "softwareVersion": "1.1.0",
+  "license": "https://www.gnu.org/licenses/gpl-3.0.html",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+  "downloadUrl": "https://github.com/ysalitrynskyi/MacroPad/releases/latest",
+  "codeRepository": "https://github.com/ysalitrynskyi/MacroPad",
+  "screenshot": "https://ysalitrynskyi.github.io/MacroPad/screenshot.png",
+  "description": "Configurator for USB macro keypads with knobs sold on AliExpress and Amazon: MINI KeyBoard (1189:8890 and related), SDINNOVATION SIDE-KEYBOARD (6D7B:DCFA) and other SDCX / Huali pads."
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    { "@type": "Question", "name": "Which macro keypads does MacroPad support?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Pads with USB id 1189:8890 (MINI KeyBoard, 3 keys + 1 knob), 1189:8840, 1189:8830-8833 and 1189:8810, and WebHub pads from SDINNOVATION / SDCX / Huali such as the SIDE-KEYBOARD (6D7B:DCFA). Other ids can be added in config.txt." } },
+    { "@type": "Question", "name": "Can the knob scroll or change the volume faster?",
+      "acceptedAnswer": { "@type": "Answer", "text": "The knob can scroll 1 to 10 wheel steps per click. Media keys such as volume up send one step per click; the WebHub firmware has no repeat count for them." } },
+    { "@type": "Question", "name": "Can I change the LED brightness of the SIDE-KEYBOARD?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Yes. The LED tab sets effect, colour, brightness and speed, and a key or knob can be set to change the keypad's brightness, effect, colour or speed." } },
+    { "@type": "Question", "name": "Does it need to keep running?",
+      "acceptedAnswer": { "@type": "Answer", "text": "No. The mapping is written into the keypad's memory, so the keypad works on any computer with the app closed." } }
+  ]
+}
+</script>
+<style>
+  :root { --bg: #fbfbf9; --fg: #1c1d1f; --muted: #5d6068; --line: #dedfe2; --card: #ffffff; --accent: #1f5fbf; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #151618; --fg: #e8e8ea; --muted: #a2a5ad; --line: #2e3035; --card: #1d1f22; --accent: #7fb0ff; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--fg); font: 17px/1.6 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  main { max-width: 860px; margin: 0 auto; padding: 40px 16px 64px; }
+  h1 { font-size: 2rem; line-height: 1.2; margin: 0 0 12px; }
+  h2 { font-size: 1.3rem; margin: 40px 0 8px; }
+  p, li { color: var(--fg); }
+  .lede { color: var(--muted); font-size: 1.1rem; }
+  a { color: var(--accent); }
+  .cta { display: inline-block; margin: 16px 12px 8px 0; padding: 10px 18px; border-radius: 8px; background: var(--accent); color: var(--bg); text-decoration: none; font-weight: 600; }
+  .cta.secondary { background: transparent; color: var(--accent); border: 1px solid var(--accent); }
+  img { max-width: 100%; height: auto; border: 1px solid var(--line); border-radius: 8px; margin-top: 24px; }
+  .table-wrap { overflow-x: auto; }
+  table { border-collapse: collapse; width: 100%; font-size: 0.95rem; }
+  th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  code { font-family: ui-monospace, "Cascadia Mono", Consolas, monospace; font-size: 0.92em; }
+  dt { font-weight: 600; margin-top: 16px; }
+  dd { margin: 4px 0 0; color: var(--muted); }
+  footer { margin-top: 48px; color: var(--muted); font-size: 0.9rem; }
+</style>
+</head>
+<body>
+<main>
+  <h1>MacroPad: free software for Chinese USB macro keypads with knobs</h1>
+  <p class="lede">For the small programmable keypads sold on AliExpress, Amazon, Temu and eBay (1 to 12 keys, one to three volume knobs), often listed as “MINI KeyBoard” or “3 key 1 knob macro keyboard”, and for the <strong>SDINNOVATION SIDE-KEYBOARD</strong>. Windows 10 and 11, open source (GPL-3.0).</p>
+  <a class="cta" href="https://github.com/ysalitrynskyi/MacroPad/releases/latest">Download for Windows</a>
+  <a class="cta secondary" href="https://github.com/ysalitrynskyi/MacroPad">Source on GitHub</a>
+
+  <img src="screenshot.png" width="1081" height="705" alt="MacroPad connected to a SIDE-KEYBOARD, showing each key's current setting">
+
+  <h2>What it does</h2>
+  <ul>
+    <li>Put a keyboard shortcut, media key, mouse click or scroll on every key and every knob direction (turn left, press, turn right).</li>
+    <li>Shows what the keypad holds right now, and confirms every upload by reading it back (SIDE-KEYBOARD and other WebHub pads).</li>
+    <li>Scroll speed: 1 to 10 wheel steps per knob click.</li>
+    <li>LED effect, colour, brightness and speed, plus keys that change the keypad's own LEDs.</li>
+    <li>The mapping is stored in the keypad. Nothing keeps running on your PC, and the pad works on any computer.</li>
+  </ul>
+
+  <h2>Supported keypads</h2>
+  <p>Find the id in Device Manager → the keypad's “USB Input Device” → Details → Hardware Ids (<code>VID_xxxx&amp;PID_xxxx</code>).</p>
+  <div class="table-wrap">
+  <table>
+    <thead><tr><th>USB id</th><th>Keypad</th><th>Protocol</th></tr></thead>
+    <tbody>
+      <tr><td><code>6D7B:DCFA</code></td><td>SDINNOVATION SIDE-KEYBOARD, 3 keys + 1 knob (tested)</td><td>WebHub</td></tr>
+      <tr><td><code>1189:8890</code></td><td>MINI KeyBoard, 3 keys + 1 knob, and a 4-key variant (tested upstream)</td><td>Legacy</td></tr>
+      <tr><td><code>1189:8840</code></td><td>Typewriter-style pad, 6 keys + 2 knobs</td><td>Extended</td></tr>
+      <tr><td><code>1189:8830</code>–<code>8833</code>, <code>1189:8810</code></td><td>6, 9 and 12 key pads with 1–3 knobs</td><td>Extended</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h2>Questions</h2>
+  <dl>
+    <dt>The software that came with my keypad doesn't work or is only in Chinese.</dt>
+    <dd>MacroPad replaces <code>MINI_KeyBoard.exe</code> and the vendor's browser tools at sdcx-tech.com / huali-tech.com. Check your USB id against the table.</dd>
+    <dt>Can the knob change the volume faster?</dt>
+    <dd>Media keys send one step per knob click; the WebHub firmware has no repeat count for them. Scrolling can go faster: 1 to 10 steps per click.</dd>
+    <dt>Can I dim or turn off the LEDs?</dt>
+    <dd>Yes. Choose “Off”, or a single colour with the brightness slider, in the LED tab.</dd>
+    <dt>Mac or Linux?</dt>
+    <dd>MacroPad is Windows-only. On macOS, try <a href="https://github.com/dozzenn/knurl">Knurl</a>.</dd>
+  </dl>
+
+  <footer>
+    A fork of <a href="https://github.com/rOzzy1987/MacroPad">rOzzy1987/MacroPad</a> by Mihály Rozovits, with community fixes and SIDE-KEYBOARD support. Licensed GPL-3.0.
+  </footer>
+</main>
+</body>
+</html>

@@ -24,8 +24,9 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <AssemblyVersion>1.0.0</AssemblyVersion>
-    <AssemblyFileVersion>1.0.*.*</AssemblyFileVersion>
+    <AssemblyVersion>1.1.0</AssemblyVersion>
+    <FileVersion>1.1.0</FileVersion>
+    <Version>1.1.0</Version>
     <AssemblyName>RSoft.MacroPad</AssemblyName>
     <AssemblyTitle>RSoft MacroPad</AssemblyTitle>
     <Copyright>RSoft (c) 2023</Copyright>
@@ -38,6 +39,9 @@ For others I just took a wild guess based on the source code of the original sof
 Feel free to reach out to me with your findings, issues, ideas or anything...
       
 Enjoy!
+
+1.1: WebHub support (SDINNOVATION SIDE-KEYBOARD and other SDCX / Huali pads), read-back of the keypad's
+current settings, scroll speed, LED brightness and speed. github.com/ysalitrynskyi/MacroPad
     </Description>
   </PropertyGroup>
   <ItemGroup>
