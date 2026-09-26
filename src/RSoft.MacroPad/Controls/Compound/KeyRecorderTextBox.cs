@@ -9,8 +9,11 @@ using System.Windows.Forms;
 using RSoft.MacroPad.BLL.Infrasturture.Model;
 using RSoft.MacroPad.BLL.Infrasturture.Protocol.Mappers;
 using RSoft.MacroPad.Controls.Simple;
+using RSoft.MacroPad.Forms;
 using RSoft.MacroPad.Infrastructure;
 using RSoft.MacroPad.Model;
+using Windows.Win32;
+using Windows.Win32.UI.Input.KeyboardAndMouse;
 
 namespace RSoft.MacroPad.Controls.Compound
 {
@@ -241,6 +244,30 @@ namespace RSoft.MacroPad.Controls.Compound
                 k == Keys.LShiftKey || k == Keys.RShiftKey ||
                 k == Keys.LControlKey || k == Keys.RControlKey ||
                 k == Keys.LWin || k == Keys.RWin;
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            var manualKeyForm = new ManualKeyForm();
+            manualKeyForm.ShowDialog();
+            if (manualKeyForm.DialogResult == DialogResult.OK && manualKeyForm.keySelected != VirtualKey.None)
+            {
+                var newModStroke = new KeyStroke
+                {
+                    Key = (Keys)manualKeyForm.keySelected,
+                    ScanCode = PInvoke.MapVirtualKey((uint)manualKeyForm.keySelected, MAP_VIRTUAL_KEY_TYPE.MAPVK_VK_TO_VSC),
+                    Operation = KeyStrokeOperation.Release,
+                    AltL = (manualKeyForm.modifier & Modifier.LeftAlt) != Modifier.None,
+                    AltR = (manualKeyForm.modifier & Modifier.RightAlt) != Modifier.None,
+                    CtrlL = (manualKeyForm.modifier & Modifier.LeftCtrl) != Modifier.None,
+                    CtrlR = (manualKeyForm.modifier & Modifier.RightCtrl) != Modifier.None,
+                    ShiftL = (manualKeyForm.modifier & Modifier.LeftShift) != Modifier.None,
+                    ShiftR = (manualKeyForm.modifier & Modifier.RightShift) != Modifier.None,
+                    WinL = (manualKeyForm.modifier & Modifier.LeftWin) != Modifier.None,
+                    WinR = (manualKeyForm.modifier & Modifier.RightWin) != Modifier.None,
+                };
+                _sequence.Add(newModStroke);
+            }
         }
     }
 }
