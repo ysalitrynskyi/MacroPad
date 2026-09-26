@@ -53,6 +53,16 @@ namespace RSoft.MacroPad.Controls.Tabs
         }
 
 
+        /// <summary>
+        /// Names the modes the connected keypad uses; null restores the generic "Mode n" labels
+        /// </summary>
+        public void SetModeNames(string[] names)
+        {
+            var buttons = new[] { rbMode0, rbMode1, rbMode2, rbMode3, rbMode4, rbMode5 };
+            for (var i = 0; i < buttons.Length; i++)
+                buttons[i].Text = names != null && i < names.Length ? names[i] : i == 0 ? "Off" : $"Mode {i}";
+        }
+
         public LedTab()
         {
             InitializeComponent();

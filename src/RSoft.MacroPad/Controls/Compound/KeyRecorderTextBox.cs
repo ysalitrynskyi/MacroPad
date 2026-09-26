@@ -124,6 +124,9 @@ namespace RSoft.MacroPad.Controls.Compound
                 KeyStrokeAdded?.Invoke(this, _sequence.Last());
             }
 
+            if (Listen && _sequence.Count >= SequenceMaxLength)
+                Listen = false;
+
             var displaysToDelete = _sequenceDisplay.Where(d => !_sequence.Contains(d.Stroke)).ToList();
             foreach (var item in displaysToDelete)
             {

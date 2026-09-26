@@ -82,7 +82,7 @@
             checkBox1.TabIndex = 0;
             checkBox1.Text = "●";
             checkBox1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            toolTip1.SetToolTip(checkBox1, "Record");
+            toolTip1.SetToolTip(checkBox1, "Record: click, then press the shortcut on your keyboard");
             checkBox1.UseVisualStyleBackColor = true;
             checkBox1.CheckedChanged += checkBox1_CheckedChanged;
             // 
@@ -96,7 +96,7 @@
             button3.Size = new System.Drawing.Size(39, 45);
             button3.TabIndex = 3;
             button3.Text = "≡";
-            toolTip1.SetToolTip(button3, "Manually Enter Key");
+            toolTip1.SetToolTip(button3, "Pick a key from a list");
             button3.UseVisualStyleBackColor = true;
             button3.Click += button3_Click;
             // 

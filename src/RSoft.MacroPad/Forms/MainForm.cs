@@ -16,6 +16,7 @@ using RSoft.MacroPad.BLL.Infrasturture.Model;
 using RSoft.MacroPad.BLL.Infrasturture.Physical;
 using RSoft.MacroPad.BLL.Infrasturture.Protocol;
 using RSoft.MacroPad.BLL.Infrasturture.Protocol.Mappers;
+using RSoft.MacroPad.BLL.Infrasturture.Protocol.WebHub;
 using RSoft.MacroPad.BLL.Infrasturture.UsbDevice;
 using RSoft.MacroPad.Infrastructure;
 using Windows.Win32;
@@ -32,13 +33,139 @@ namespace RSoft.MacroPad.Forms
         private ConfigurationReader _configReader = new ConfigurationReader();
         private ComposerRepository _composerRepository = new ComposerRepository();
 
+        private static readonly string[] WebHubLedModes = { "Off", "Solid", "Breathing", "Blink", "Tide" };
+        private Label _lblHint;
+        private Label _lblSelected;
+        private Label _lblOnKeypad;
+        private WebHubDeviceState _deviceState;
+
 
         public MainForm()
         {
             InitializeComponent();
 
+            InitializeGuidance();
             InitializeLayouts();
             InitializeUsb();
+        }
+
+        private void InitializeGuidance()
+        {
+            tsSend.DropDownItems.Clear();
+            tsSend.AutoSize = true;
+            tsSend.DisplayStyle = ToolStripItemDisplayStyle.ImageAndText;
+            tsSend.Text = "Upload to keypad";
+            tsSend.ToolTipText = "Write the selected key's setting to the keypad (Ctrl+S)";
+
+            tsLayout.AutoSize = true;
+            tsLayout.DisplayStyle = ToolStripItemDisplayStyle.ImageAndText;
+            tsLayout.Text = "Layout";
+
+            tsAbout.AutoSize = true;
+            tsAbout.DisplayStyle = ToolStripItemDisplayStyle.ImageAndText;
+            tsAbout.Text = "About";
+
+            tsSetParams.Text = "Report ID...";
+            tsSetParams.ToolTipText = "Try a different report id if the keypad does not react to uploads";
+            menuStrip1.Items.Add(tsSetParams);
+
+            _lblHint = new Label
+            {
+                Dock = DockStyle.Top,
+                AutoSize = true,
+                ForeColor = SystemColors.GrayText,
+                Padding = new Padding(0, 4, 0, 4),
+                Text = "1. Click a button in the picture, or a knob: its centre is the press, its left and right sides are the turns.\n" +
+                       "2. Under Key setup, choose what it should do: record a shortcut, pick a media key, or set the LEDs.\n" +
+                       "3. Click \"Upload to keypad\"."
+            };
+            _lblSelected = new Label
+            {
+                Dock = DockStyle.Top,
+                AutoSize = true,
+                Font = new Font(Font, FontStyle.Bold),
+                Padding = new Padding(0, 4, 0, 4),
+            };
+            _lblOnKeypad = new Label
+            {
+                Dock = DockStyle.Right,
+                AutoSize = true,
+                Padding = new Padding(12, 4, 12, 4),
+                BorderStyle = BorderStyle.FixedSingle,
+                BackColor = SystemColors.Window,
+                Visible = false,
+            };
+            groupBox1.Controls.Add(_lblOnKeypad);
+            groupBox1.Controls.Add(_lblSelected);
+            groupBox1.Controls.Add(_lblHint);
+
+            keyboardVisual1.FunctionSelected += (s, e) => UpdateSelectionText();
+        }
+
+        protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
+        {
+            if (keyData == (Keys.Control | Keys.S) && tsSend.Enabled)
+            {
+                tsSend_Click(this, EventArgs.Empty);
+                return true;
+            }
+            return base.ProcessCmdKey(ref msg, keyData);
+        }
+
+        private static string ActionName(InputAction action, KeyboardLayout layout)
+        {
+            if (action >= InputAction.Key1 && action <= InputAction.Key12)
+                return $"Button {(byte)action}";
+            if (action < InputAction.Knob1Left || action > InputAction.Knob3Right)
+                return action.ToString();
+
+            var knob = ((byte)action - (byte)InputAction.Knob1Left) / 3 + 1;
+            var part = ((byte)action - (byte)InputAction.Knob1Left) % 3;
+            var knobCount = layout?.Controls?.Count(c => c.Actions.Any(a => a >= InputAction.Knob1Left)) ?? 0;
+            var name = knobCount > 1 ? $"Knob {knob}" : "Knob";
+            return name + (part == 0 ? " turn left" : part == 1 ? " press" : " turn right");
+        }
+
+        private IEnumerable<InputAction> LayoutActions()
+            => keyboardVisual1.KeyboardLayout?.Controls?.SelectMany(c => c.Actions) ?? Enumerable.Empty<InputAction>();
+
+        private void UpdateSelectionText()
+        {
+            var action = keyboardVisual1.SelectedAction;
+            if (action == InputAction.None)
+            {
+                _lblSelected.Text = "Nothing selected";
+                return;
+            }
+            var text = $"Selected: {ActionName(action, keyboardVisual1.KeyboardLayout)}";
+            if (_deviceState != null && _deviceState.Mappings.TryGetValue(action, out var current))
+                text += $"  (on the keypad now: {current})";
+            _lblSelected.Text = text;
+        }
+
+        private void RefreshDeviceState()
+        {
+            _deviceState = _usb.ProtocolType == ProtocolType.WebHub
+                ? WebHubDeviceState.Read(_usb, keyboardVisual1.Layer)
+                : null;
+
+            if (_deviceState == null)
+            {
+                _lblOnKeypad.Visible = false;
+            }
+            else
+            {
+                var layout = keyboardVisual1.KeyboardLayout;
+                var parts = LayoutActions()
+                    .Where(a => _deviceState.Mappings.ContainsKey(a))
+                    .Select(a => $"{ActionName(a, layout)}: {_deviceState.Mappings[a]}")
+                    .ToList();
+                if (_deviceState.Backlight != null)
+                    parts.Add($"LEDs: {_deviceState.Backlight}");
+                _lblOnKeypad.Text = "On the keypad now:\n" + string.Join("\n", parts);
+                _lblOnKeypad.Visible = true;
+            }
+            UpdateSelectionText();
         }
 
 
@@ -60,6 +187,11 @@ namespace RSoft.MacroPad.Forms
                 }
 
                 lblCommStatus.Text = $"Connected: ({_usb.VendorId}:{_usb.ProductId}) Protocol: {_usb.ProtocolType}.id{_usb.Version}";
+
+                var webHub = _usb.ProtocolType == ProtocolType.WebHub;
+                tsSetParams.Visible = !webHub;
+                keyboardFunction1.SetLedModeNames(webHub ? WebHubLedModes : null);
+                RefreshDeviceState();
 
                 ShowDisclaimerIfNeeded();
             };
@@ -125,6 +257,7 @@ namespace RSoft.MacroPad.Forms
             if (keyboardVisual1.SelectedAction == InputAction.None)
             {
                 MessageBox.Show("Please select a key or knob action to map!");
+                return;
             }
             var composer = _composerRepository.Get(_usb.ProtocolType, _usb.Version);
 
@@ -170,6 +303,15 @@ namespace RSoft.MacroPad.Forms
             lblCommStatus.Text = success
                 ? "Writing successful"
                 : "Write failed";
+
+            if (success && _usb.ProtocolType == ProtocolType.WebHub)
+            {
+                RefreshDeviceState();
+                if (keyboardFunction1.Function == Model.SetFunction.LED)
+                    lblCommStatus.Text = $"Saved to keypad. LEDs: {_deviceState?.Backlight ?? "could not read back"}";
+                else if (_deviceState != null && _deviceState.Mappings.TryGetValue(keyboardVisual1.SelectedAction, out var now))
+                    lblCommStatus.Text = $"Saved to keypad. {ActionName(keyboardVisual1.SelectedAction, keyboardVisual1.KeyboardLayout)} now does: {now}";
+            }
             lblCommStatus.Text += $" [{DateTime.Now.ToString("T")}]";
         }
 

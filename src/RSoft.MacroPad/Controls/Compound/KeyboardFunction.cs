@@ -80,6 +80,8 @@ namespace RSoft.MacroPad.Controls.Compound
             set { ledTab1.Mode = value; }
         }
 
+        public void SetLedModeNames(string[] names) => ledTab1.SetModeNames(names);
+
         public KeyboardFunction()
         {
             InitializeComponent();
