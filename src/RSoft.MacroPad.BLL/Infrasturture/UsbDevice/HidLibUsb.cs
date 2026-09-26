@@ -15,6 +15,11 @@ namespace RSoft.MacroPad.BLL.Infrasturture.UsbDevice
             return _hidLib.WriteDevice(report.ReportId, report.Data);
         }
 
+        public override byte[] Request(Report report)
+        {
+            return _hidLib.Request(report.ReportId, report.Data);
+        }
+
         //protected override byte KeyBoardVersionCheck()
         //{
         //    // HidLibUsb implementation order.

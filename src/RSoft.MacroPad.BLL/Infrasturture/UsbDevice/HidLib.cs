@@ -76,6 +76,11 @@ namespace RSoft.MacroPad.BLL.Infrasturture.UsbDevice
             return false;
         }
 
+        public byte[] Request(byte reportId, byte[] buffer)
+        {
+            return _webHub?.Transfer(reportId, buffer);
+        }
+
         public bool WriteDevice(byte reportId, byte[] buffer)
         {
             if (_webHub != null)

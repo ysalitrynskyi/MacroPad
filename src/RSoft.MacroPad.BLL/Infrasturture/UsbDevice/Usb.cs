@@ -22,6 +22,11 @@ namespace RSoft.MacroPad.BLL.Infrasturture.UsbDevice
 
         bool Write(Report report);
 
+        /// <summary>
+        /// Sends a frame and returns the keypad's answer. Only WebHub keypads answer; the others return null.
+        /// </summary>
+        byte[] Request(Report report);
+
         event EventHandler OnConnected;
     }
 
@@ -72,5 +77,7 @@ namespace RSoft.MacroPad.BLL.Infrasturture.UsbDevice
         }
 
         public abstract bool Write(Report report);
+
+        public virtual byte[] Request(Report report) => null;
     }
 }
