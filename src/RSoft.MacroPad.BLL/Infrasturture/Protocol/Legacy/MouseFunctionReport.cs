@@ -7,7 +7,7 @@ namespace RSoft.MacroPad.BLL.Infrasturture.Protocol.Legacy
     {
         private MouseFunctionReport() { }
 
-        public static MouseFunctionReport Create(byte reportId, InputAction action, byte layerNo, MouseButton button, Modifier modifiers)
+        public static MouseFunctionReport Create(byte reportId, InputAction action, byte layerNo, MouseButton button, Modifier modifiers, byte scrollAmount = 1)
         {
             var r = new MouseFunctionReport();
             r.ReportId = reportId;
@@ -20,7 +20,7 @@ namespace RSoft.MacroPad.BLL.Infrasturture.Protocol.Legacy
             r.Data[2] = button.Button();
             r.Data[3] = 0;
             r.Data[4] = 0;
-            r.Data[5] = button.Scroll();
+            r.Data[5] = button.Scroll(scrollAmount);
             r.Data[6] = (byte)modifiers;
             return r;
         }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Windows.Forms;
 using RSoft.MacroPad.BLL.Infrasturture.Model;
 using RSoft.MacroPad.BLL.Infrasturture.Physical;
@@ -82,6 +83,45 @@ namespace RSoft.MacroPad.Controls.Compound
 
         public void SetLedModeNames(string[] names) => ledTab1.SetModeNames(names);
 
+        public byte MouseScrollAmount => mouseButtonsTab1.ScrollAmount;
+        public byte LedBrightness => ledTab1.Brightness;
+        public byte LedSpeed => ledTab1.Speed;
+        public KeypadLedFunction KeypadLedFunction { get; private set; } = KeypadLedFunction.BrightnessUp;
+
+        private TabPage tabKeypadLed;
+
+        /// <summary>
+        /// Switches on what only WebHub keypads can do: LED brightness and speed, keys that control the keypad's
+        /// own LEDs. Mouse actions there cannot carry modifiers.
+        /// </summary>
+        public void SetWebHubFeatures(bool enabled)
+        {
+            ledTab1.Adjustable = enabled;
+            mouseButtonsTab1.ModifiersSupported = !enabled;
+
+            if (enabled && tabKeypadLed == null)
+            {
+                tabKeypadLed = new TabPage("Keypad LEDs") { UseVisualStyleBackColor = true, Padding = new Padding(6) };
+                var y = 8;
+                foreach (var fn in Enum.GetValues(typeof(KeypadLedFunction)).Cast<KeypadLedFunction>())
+                {
+                    var field = typeof(KeypadLedFunction).GetField(fn.ToString());
+                    var text = field.GetCustomAttributes(typeof(DescriptionAttribute), false).Cast<DescriptionAttribute>().First().Description;
+                    var rb = new RadioButton { Text = text, Tag = fn, AutoSize = true, Location = new System.Drawing.Point(8, y), Checked = fn == KeypadLedFunction };
+                    rb.CheckedChanged += (s, e) => { if (((RadioButton)s).Checked) KeypadLedFunction = (KeypadLedFunction)((RadioButton)s).Tag; };
+                    tabKeypadLed.Controls.Add(rb);
+                    y += 24;
+                }
+                tabControl2.TabPages.Add(tabKeypadLed);
+            }
+            else if (!enabled && tabKeypadLed != null)
+            {
+                tabControl2.TabPages.Remove(tabKeypadLed);
+                tabKeypadLed.Dispose();
+                tabKeypadLed = null;
+            }
+        }
+
         public KeyboardFunction()
         {
             InitializeComponent();
@@ -114,6 +154,8 @@ namespace RSoft.MacroPad.Controls.Compound
                     Function = SetFunction.KeySequence;
                 else if (tabControl2.SelectedTab == tabMedia)
                     Function = SetFunction.MediaKey;
+                else if (tabKeypadLed != null && tabControl2.SelectedTab == tabKeypadLed)
+                    Function = SetFunction.KeypadLed;
                 else Function = SetFunction.Mouse;
             }
             if (Function != SetFunction.KeySequence)
@@ -138,6 +180,7 @@ namespace RSoft.MacroPad.Controls.Compound
                 case SetFunction.KeySequence: tabControl2.SelectTab(tabSequence); break;
                 case SetFunction.MediaKey: tabControl2.SelectTab(tabMedia); break;
                 case SetFunction.Mouse: tabControl2.SelectTab(tabMouse); break;
+                case SetFunction.KeypadLed: if (tabKeypadLed != null) tabControl2.SelectTab(tabKeypadLed); break;
             }
         }
 

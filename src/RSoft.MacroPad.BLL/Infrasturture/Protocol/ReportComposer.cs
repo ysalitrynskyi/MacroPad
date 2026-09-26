@@ -11,7 +11,8 @@ namespace RSoft.MacroPad.BLL.Infrasturture.Protocol
 
         IEnumerable<Report> Media(InputAction action, byte layerNo, MediaKey key);
 
-        IEnumerable<Report> Mouse(InputAction action, byte layerNo, MouseButton func, Modifier modifiers);
+        /// <param name="scrollAmount">Wheel steps per scroll action (1 = normal)</param>
+        IEnumerable<Report> Mouse(InputAction action, byte layerNo, MouseButton func, Modifier modifiers, byte scrollAmount = 1);
 
         IEnumerable<Report> Led(byte layerNo, LedMode mode, LedColor color);
 
@@ -63,10 +64,10 @@ namespace RSoft.MacroPad.BLL.Infrasturture.Protocol
             return KeyFunctionEnd(result);
         }
 
-        public IEnumerable<Report> Mouse(InputAction action, byte layerNo, MouseButton func, Modifier modifiers)
+        public IEnumerable<Report> Mouse(InputAction action, byte layerNo, MouseButton func, Modifier modifiers, byte scrollAmount = 1)
         {
             var result = KeyFunctionInit(layerNo);
-            result.Add(MouseFunctionReport.Create(ReportId, action, layerNo, func, modifiers));
+            result.Add(MouseFunctionReport.Create(ReportId, action, layerNo, func, modifiers, scrollAmount));
             return KeyFunctionEnd(result);
         }
 
@@ -102,9 +103,9 @@ namespace RSoft.MacroPad.BLL.Infrasturture.Protocol
             return new[] { ExtendedReport.CreateMedia(ReportId, action, layerNo, key) };
         }
 
-        public IEnumerable<Report> Mouse(InputAction action, byte layerNo, MouseButton func, Modifier modifiers)
+        public IEnumerable<Report> Mouse(InputAction action, byte layerNo, MouseButton func, Modifier modifiers, byte scrollAmount = 1)
         {
-            return new[] { ExtendedReport.CreateMouse(ReportId, action, layerNo,func, modifiers) };
+            return new[] { ExtendedReport.CreateMouse(ReportId, action, layerNo,func, modifiers, scrollAmount) };
         }
     }
 }

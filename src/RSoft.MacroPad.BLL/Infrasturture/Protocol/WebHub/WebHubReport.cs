@@ -1,4 +1,5 @@
-﻿using RSoft.MacroPad.BLL.Infrasturture.Model;
+﻿using System;
+using RSoft.MacroPad.BLL.Infrasturture.Model;
 
 namespace RSoft.MacroPad.BLL.Infrasturture.Protocol.WebHub
 {
@@ -39,11 +40,16 @@ namespace RSoft.MacroPad.BLL.Infrasturture.Protocol.WebHub
             return Create(WriteKey, 7, (byte)(offset & 0xFF), (byte)((offset >> 8) & 0xFF), 0, layer, 0, (byte)type, c1, c2, c3);
         }
 
-        public static WebHubReport CreateBacklight(byte mode, bool usePalette, byte hue)
+        /// <param name="brightness">0-100 percent. The firmware dims through the colour's HSV value; its own brightness byte (0-4) is written alongside, as the vendor tool does</param>
+        /// <param name="speed">0-4, used by the animated effects</param>
+        public static WebHubReport CreateBacklight(byte mode, bool usePalette, byte hue, byte brightness = 100, byte speed = 2)
         {
-            const byte type = 1, brightness = 4, speed = 2, direction = 0;
+            const byte type = 1, direction = 0;
             var color = (byte)(usePalette || mode == 0 ? 0 : 1);
-            return Create(WriteBacklight, 11, 0, 0, type, 0, mode, brightness, speed, direction, color, 0, hue, 255, 255);
+            var percent = Math.Min((int)brightness, 100);
+            var level = (byte)Math.Round(percent * 4 / 100.0);
+            var value = (byte)Math.Round(percent * 255 / 100.0);
+            return Create(WriteBacklight, 11, 0, 0, type, 0, mode, level, Math.Min(speed, (byte)4), direction, color, 0, hue, 255, value);
         }
 
         public static WebHubReport CreateDeviceInfoRequest() => Create(ReadDeviceInfo);
@@ -71,7 +77,9 @@ namespace RSoft.MacroPad.BLL.Infrasturture.Protocol.WebHub
 
     public enum WebHubEntryType : byte
     {
+        Mouse = 0x10,
         Disabled = 0x13,
+        KeypadFunction = 0x1F,
         Standard = 0x20,
         Consumer = 0x30,
     }

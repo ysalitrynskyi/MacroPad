@@ -33,7 +33,7 @@ namespace RSoft.MacroPad.Forms
         private ConfigurationReader _configReader = new ConfigurationReader();
         private ComposerRepository _composerRepository = new ComposerRepository();
 
-        private static readonly string[] WebHubLedModes = { "Off", "Solid", "Breathing", "Blink", "Tide" };
+        private static readonly string[] WebHubLedModes = { "Off", "Solid", "Breathing", "On keypress", "Tide" };
         private Label _lblHint;
         private Label _lblSelected;
         private Label _lblOnKeypad;
@@ -191,6 +191,7 @@ namespace RSoft.MacroPad.Forms
                 var webHub = _usb.ProtocolType == ProtocolType.WebHub;
                 tsSetParams.Visible = !webHub;
                 keyboardFunction1.SetLedModeNames(webHub ? WebHubLedModes : null);
+                keyboardFunction1.SetWebHubFeatures(webHub);
                 RefreshDeviceState();
 
                 ShowDisclaimerIfNeeded();
@@ -265,7 +266,13 @@ namespace RSoft.MacroPad.Forms
             switch (keyboardFunction1.Function)
             {
                 case Model.SetFunction.LED:
-                    reports = composer.Led(keyboardVisual1.Layer, keyboardFunction1.LedMode, keyboardFunction1.LedColor);
+                    reports = composer is WebHubReportComposer webHubLed
+                        ? webHubLed.Led(keyboardVisual1.Layer, keyboardFunction1.LedMode, keyboardFunction1.LedColor, keyboardFunction1.LedBrightness, keyboardFunction1.LedSpeed)
+                        : composer.Led(keyboardVisual1.Layer, keyboardFunction1.LedMode, keyboardFunction1.LedColor);
+                    break;
+                case Model.SetFunction.KeypadLed:
+                    if (composer is WebHubReportComposer webHubKeypad)
+                        reports = webHubKeypad.KeypadLed(keyboardVisual1.SelectedAction, keyboardVisual1.Layer, keyboardFunction1.KeypadLedFunction);
                     break;
                 case Model.SetFunction.KeySequence:
                     var currentLayout = PInvoke.GetKeyboardLayout(0);
@@ -281,7 +288,7 @@ namespace RSoft.MacroPad.Forms
                     reports = composer.Media(keyboardVisual1.SelectedAction, keyboardVisual1.Layer, MediaKeyMapper.Map((VirtualKey)keyboardFunction1.MediaKey));
                     break;
                 case Model.SetFunction.Mouse:
-                    reports = composer.Mouse(keyboardVisual1.SelectedAction, keyboardVisual1.Layer, keyboardFunction1.MouseButton, keyboardFunction1.MouseModifier);
+                    reports = composer.Mouse(keyboardVisual1.SelectedAction, keyboardVisual1.Layer, keyboardFunction1.MouseButton, keyboardFunction1.MouseModifier, keyboardFunction1.MouseScrollAmount);
                     break;
             }
             if (!reports.Any())

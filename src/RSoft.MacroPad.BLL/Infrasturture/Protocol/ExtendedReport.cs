@@ -32,13 +32,13 @@ namespace RSoft.MacroPad.BLL.Infrasturture.Protocol
             return Create(reportId, action, layerNo, 0, KeyType.Multimedia, data);
         }
 
-        public static ExtendedReport CreateMouse(byte reportId, InputAction action, byte layerNo, MouseButton b, Modifier modifiers)
+        public static ExtendedReport CreateMouse(byte reportId, InputAction action, byte layerNo, MouseButton b, Modifier modifiers, byte scrollAmount = 1)
         {
             var data = new byte[6];
             data[0] = b.Button();
             data[1] = 0;
             data[2] = 0;
-            data[3] = b.Scroll();
+            data[3] = b.Scroll(scrollAmount);
             data[4] = (byte)modifiers;
             data[5] = 0;
 

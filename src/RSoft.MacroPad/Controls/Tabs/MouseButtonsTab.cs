@@ -10,6 +10,27 @@ namespace RSoft.MacroPad.Controls.Tabs
     {
         private Modifier modifier = Modifier.None;
         private MouseButton mouseButton = MouseButton.Left;
+        private NumericUpDown nudScroll;
+
+        /// <summary>
+        /// Wheel steps sent per scroll action
+        /// </summary>
+        public byte ScrollAmount
+        {
+            get => (byte)nudScroll.Value;
+            set => nudScroll.Value = Math.Max(nudScroll.Minimum, Math.Min(nudScroll.Maximum, value));
+        }
+
+        public bool ModifiersSupported
+        {
+            get => gbModifiers.Enabled;
+            set
+            {
+                gbModifiers.Enabled = value;
+                if (!value)
+                    Modifier = Modifier.None;
+            }
+        }
 
         public Modifier Modifier
         {
@@ -49,6 +70,18 @@ namespace RSoft.MacroPad.Controls.Tabs
             cbCtrlR.Tag = Modifier.RightCtrl;
             cbWinL.Tag = Modifier.LeftWin;
             cbWinR.Tag = Modifier.RightWin;
+
+            var gbScroll = new GroupBox
+            {
+                Text = "Scroll speed",
+                Location = new System.Drawing.Point(gbModifiers.Right + 6, gbModifiers.Top),
+                Size = new System.Drawing.Size(150, gbModifiers.Height),
+            };
+            gbScroll.Controls.Add(new Label { Text = "Wheel steps per click:", AutoSize = true, Location = new System.Drawing.Point(6, 22) });
+            nudScroll = new NumericUpDown { Minimum = 1, Maximum = 10, Value = 1, Location = new System.Drawing.Point(9, 42), Width = 60 };
+            gbScroll.Controls.Add(nudScroll);
+            gbScroll.Controls.Add(new Label { Text = "Higher scrolls faster", AutoSize = true, Location = new System.Drawing.Point(6, 72) });
+            Controls.Add(gbScroll);
 
             UpdateControls();
         }

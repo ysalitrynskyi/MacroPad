@@ -40,7 +40,7 @@ namespace RSoft.MacroPad.BLL.Infrasturture.Protocol.WebHub
 
             var light = usb.Request(WebHubReport.Create(WebHubReport.ReadBacklight));
             if (light != null && light.Length >= 16)
-                result.Backlight = DescribeBacklight(light[7], light[11], light[13]);
+                result.Backlight = DescribeBacklight(light[7], light[11], light[13], light[9], light[15]);
 
             return result;
         }
@@ -57,6 +57,13 @@ namespace RSoft.MacroPad.BLL.Infrasturture.Protocol.WebHub
                     return DescribeModifiers((Modifier)entry[1]) + DescribeKey(entry[2]);
                 case WebHubEntryType.Consumer:
                     return DescribeMedia((ushort)(entry[1] | entry[2] << 8));
+                case WebHubEntryType.Mouse:
+                    return DescribeMouse(entry[1], (sbyte)entry[3]);
+                case WebHubEntryType.KeypadFunction:
+                    var field = typeof(KeypadLedFunction).GetField(((KeypadLedFunction)entry[1]).ToString());
+                    var description = field?.GetCustomAttributes(typeof(System.ComponentModel.DescriptionAttribute), false)
+                        .Cast<System.ComponentModel.DescriptionAttribute>().FirstOrDefault()?.Description;
+                    return description ?? $"keypad function {entry[1]}";
             }
             return $"unknown (type 0x{entry[0]:X2})";
         }
@@ -99,6 +106,19 @@ namespace RSoft.MacroPad.BLL.Infrasturture.Protocol.WebHub
             return name;
         }
 
+        private static string DescribeMouse(byte buttons, sbyte wheel)
+        {
+            var parts = new List<string>();
+            if ((buttons & 1) != 0) parts.Add("Left click");
+            if ((buttons & 2) != 0) parts.Add("Right click");
+            if ((buttons & 4) != 0) parts.Add("Middle click");
+            if ((buttons & 8) != 0) parts.Add("Back");
+            if ((buttons & 16) != 0) parts.Add("Forward");
+            if (wheel != 0)
+                parts.Add((wheel > 0 ? "Scroll up" : "Scroll down") + (Math.Abs(wheel) > 1 ? $" x{Math.Abs(wheel)}" : ""));
+            return parts.Count == 0 ? "nothing" : string.Join(" + ", parts);
+        }
+
         private static string DescribeMedia(ushort usage)
         {
             switch (usage)
@@ -114,17 +134,25 @@ namespace RSoft.MacroPad.BLL.Infrasturture.Protocol.WebHub
             return $"media key 0x{usage:X4}";
         }
 
-        private static string DescribeBacklight(byte mode, byte color, byte hue)
+        private static string DescribeBacklight(byte mode, byte color, byte hue, byte speed, byte value)
         {
-            var names = new[] { "off", "solid", "breathing", "blink", "tide" };
+            var names = new[] { "off", "solid", "breathing", "light on keypress", "tide" };
             var name = mode < names.Length ? names[mode] : $"mode {mode}";
-            if (mode == 0 || mode == 4)
+            if (mode == 0)
                 return name;
-            if (color == 0)
-                return name + ", colour cycling";
 
-            var hues = new (int Hue, string Name)[] { (0, "red"), (21, "orange"), (43, "yellow"), (85, "green"), (128, "cyan"), (170, "blue"), (213, "purple"), (256, "red") };
-            return $"{name}, {hues.OrderBy(h => Math.Abs(h.Hue - hue)).First().Name}";
+            var parts = new List<string> { name };
+            if (mode == 4 || color == 0)
+                parts.Add("colour cycling");
+            else
+            {
+                var hues = new (int Hue, string Name)[] { (0, "red"), (21, "orange"), (43, "yellow"), (85, "green"), (128, "cyan"), (170, "blue"), (213, "purple"), (256, "red") };
+                parts.Add(hues.OrderBy(h => Math.Abs(h.Hue - hue)).First().Name);
+                parts.Add($"brightness {Math.Round(value * 100 / 255.0)}%");
+            }
+            if (mode >= 2)
+                parts.Add($"speed {speed}");
+            return string.Join(", ", parts);
         }
     }
 }

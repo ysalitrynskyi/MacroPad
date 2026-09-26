@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using RSoft.MacroPad.BLL.Infrasturture.Model;
+using RSoft.MacroPad.BLL.Infrasturture.Protocol.Mappers;
 
 namespace RSoft.MacroPad.BLL.Infrasturture.Protocol.WebHub
 {
@@ -33,16 +34,35 @@ namespace RSoft.MacroPad.BLL.Infrasturture.Protocol.WebHub
             return new[] { WebHubReport.CreateKey(index.Value, DeviceLayer(layerNo), WebHubEntryType.Consumer, (byte)(usage & 0xFF), (byte)(usage >> 8), 0) };
         }
 
-        // The mouse entry encoding of this family is not known yet
-        public IEnumerable<Report> Mouse(InputAction action, byte layerNo, MouseButton func, Modifier modifiers)
-            => Enumerable.Empty<Report>();
+        /// <summary>
+        /// Mouse entry: [0x10, buttons, 0, wheel]. The firmware has no modifier byte for mouse entries,
+        /// so a mouse action with modifiers cannot be written.
+        /// </summary>
+        public IEnumerable<Report> Mouse(InputAction action, byte layerNo, MouseButton func, Modifier modifiers, byte scrollAmount = 1)
+        {
+            var index = WebHubReport.KeyIndex(action);
+            if (index == null || modifiers != Modifier.None)
+                return Enumerable.Empty<Report>();
+            return new[] { WebHubReport.CreateKey(index.Value, DeviceLayer(layerNo), WebHubEntryType.Mouse, func.Button(), 0, func.Scroll(scrollAmount)) };
+        }
 
         public IEnumerable<Report> Led(byte layerNo, LedMode mode, LedColor color)
+            => Led(layerNo, mode, color, 100, 2);
+
+        public IEnumerable<Report> Led(byte layerNo, LedMode mode, LedColor color, byte brightness, byte speed)
         {
-            // Modes: 0 off, 1 solid, 2 breathing, 3 blink, 4 tide
+            // Modes: 0 off, 1 solid, 2 breathing, 3 light on keypress, 4 tide
             if ((byte)mode > 4)
                 return Enumerable.Empty<Report>();
-            return new[] { WebHubReport.CreateBacklight((byte)mode, color == LedColor.Random, Hue(color)) };
+            return new[] { WebHubReport.CreateBacklight((byte)mode, color == LedColor.Random, Hue(color), brightness, speed) };
+        }
+
+        public IEnumerable<Report> KeypadLed(InputAction action, byte layerNo, KeypadLedFunction function)
+        {
+            var index = WebHubReport.KeyIndex(action);
+            if (index == null)
+                return Enumerable.Empty<Report>();
+            return new[] { WebHubReport.CreateKey(index.Value, DeviceLayer(layerNo), WebHubEntryType.KeypadFunction, (byte)function, 0, 0) };
         }
 
         private static ushort ConsumerUsage(MediaKey key)

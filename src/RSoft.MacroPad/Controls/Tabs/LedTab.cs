@@ -12,6 +12,27 @@ namespace RSoft.MacroPad.Controls.Tabs
         private int modeCount = 6;
         private int mode;
         private LedColor color = LedColor.Random;
+        private GroupBox gbAdjust;
+        private TrackBar tbBrightness;
+        private TrackBar tbSpeed;
+        private Label lblBrightness;
+        private Label lblSpeed;
+
+        /// <summary>
+        /// Brightness in percent (5-100)
+        /// </summary>
+        public byte Brightness => (byte)(tbBrightness.Value * 5);
+
+        /// <summary>
+        /// Animation speed, 0-4
+        /// </summary>
+        public byte Speed => (byte)tbSpeed.Value;
+
+        public bool Adjustable
+        {
+            get => gbAdjust.Visible;
+            set => gbAdjust.Visible = value;
+        }
 
         public int ModeCount
         {
@@ -83,7 +104,30 @@ namespace RSoft.MacroPad.Controls.Tabs
             rbMode4.Tag = 4;
             rbMode5.Tag = 5;
 
+            gbAdjust = new GroupBox
+            {
+                Text = "Brightness and speed",
+                Location = new System.Drawing.Point(gbColors.Right + 6, gbColors.Top),
+                Size = new System.Drawing.Size(220, gbColors.Height),
+                Visible = false,
+            };
+            lblBrightness = new Label { AutoSize = true, Location = new System.Drawing.Point(6, 18) };
+            tbBrightness = new TrackBar { AutoSize = false, Minimum = 1, Maximum = 20, Value = 20, TickFrequency = 2, SmallChange = 1, LargeChange = 4, Location = new System.Drawing.Point(3, 31), Width = 210, Height = 24 };
+            lblSpeed = new Label { AutoSize = true, Location = new System.Drawing.Point(6, 60) };
+            tbSpeed = new TrackBar { AutoSize = false, Minimum = 0, Maximum = 4, Value = 2, TickFrequency = 1, LargeChange = 1, Location = new System.Drawing.Point(3, 73), Width = 210, Height = 24 };
+            tbBrightness.ValueChanged += (s, e) => UpdateAdjustLabels();
+            tbSpeed.ValueChanged += (s, e) => UpdateAdjustLabels();
+            gbAdjust.Controls.AddRange(new Control[] { lblBrightness, tbBrightness, lblSpeed, tbSpeed });
+            Controls.Add(gbAdjust);
+            UpdateAdjustLabels();
+
             UpdateControls();
+        }
+
+        private void UpdateAdjustLabels()
+        {
+            lblBrightness.Text = $"Brightness: {Brightness}% (single colour)";
+            lblSpeed.Text = $"Speed: {Speed} (animated effects)";
         }
 
         private void UpdateControls()

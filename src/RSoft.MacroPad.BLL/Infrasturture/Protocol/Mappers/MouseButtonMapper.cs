@@ -27,5 +27,16 @@ namespace RSoft.MacroPad.BLL.Infrasturture.Protocol.Mappers
 
         public static byte Button(this MouseButton key) => _byteMap.First(kvp => kvp.Key == key).Button;
         public static byte Scroll(this MouseButton key) => _byteMap.First(kvp => kvp.Key == key).Scroll;
+
+        /// <summary>
+        /// Wheel value for a scroll of the given size: positive steps up, two's complement steps down
+        /// </summary>
+        public static byte Scroll(this MouseButton key, byte amount)
+        {
+            var one = key.Scroll();
+            if (one == 0 || amount <= 1)
+                return one;
+            return one == 1 ? amount : (byte)(256 - amount);
+        }
     }
 }

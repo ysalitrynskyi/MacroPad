@@ -2,6 +2,6 @@
 {
     public enum SetFunction
     {
-        LED, KeySequence, MediaKey, Mouse
+        LED, KeySequence, MediaKey, Mouse, KeypadLed
     }
 }
