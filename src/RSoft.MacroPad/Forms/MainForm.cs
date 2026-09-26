@@ -151,7 +151,8 @@ namespace RSoft.MacroPad.Forms
 
             if (_deviceState == null)
             {
-                _lblOnKeypad.Visible = false;
+                _lblOnKeypad.Text = "Could not read the keypad's current settings.\nClose other keypad tools and reconnect it.";
+                _lblOnKeypad.Visible = _usb.ProtocolType == ProtocolType.WebHub;
             }
             else
             {

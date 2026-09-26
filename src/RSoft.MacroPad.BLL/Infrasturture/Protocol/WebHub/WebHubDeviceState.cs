@@ -49,6 +49,7 @@ namespace RSoft.MacroPad.BLL.Infrasturture.Protocol.WebHub
         {
             switch ((WebHubEntryType)entry[0])
             {
+                case 0:
                 case WebHubEntryType.Disabled:
                     return "nothing";
                 case WebHubEntryType.Standard:
