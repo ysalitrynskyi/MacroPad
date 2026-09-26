@@ -74,7 +74,7 @@
             cbShiftL.TabIndex = 1;
             cbShiftL.Text = "Left SHIFT";
             cbShiftL.UseVisualStyleBackColor = true;
-            cbShiftL.Click += ModifierChanged;
+            cbShiftL.CheckedChanged += ModifierChanged;
             // 
             // cbCtrlL
             // 
@@ -86,7 +86,7 @@
             cbCtrlL.TabIndex = 1;
             cbCtrlL.Text = "Left CTRL";
             cbCtrlL.UseVisualStyleBackColor = true;
-            cbCtrlL.Click += ModifierChanged;
+            cbCtrlL.CheckedChanged += ModifierChanged;
             // 
             // cbWinR
             // 
@@ -98,7 +98,7 @@
             cbWinR.TabIndex = 1;
             cbWinR.Text = "Right WIN";
             cbWinR.UseVisualStyleBackColor = true;
-            cbWinR.Click += ModifierChanged;
+            cbWinR.CheckedChanged += ModifierChanged;
             // 
             // cbShiftR
             // 
@@ -110,7 +110,7 @@
             cbShiftR.TabIndex = 1;
             cbShiftR.Text = "Right SHIFT";
             cbShiftR.UseVisualStyleBackColor = true;
-            cbShiftR.Click += ModifierChanged;
+            cbShiftR.CheckedChanged += ModifierChanged;
             // 
             // cbAltR
             // 
@@ -122,7 +122,7 @@
             cbAltR.TabIndex = 1;
             cbAltR.Text = "Right ALT";
             cbAltR.UseVisualStyleBackColor = true;
-            cbAltR.Click += ModifierChanged;
+            cbAltR.CheckedChanged += ModifierChanged;
             // 
             // cbAltL
             // 
@@ -134,7 +134,7 @@
             cbAltL.TabIndex = 1;
             cbAltL.Text = "Left ALT";
             cbAltL.UseVisualStyleBackColor = true;
-            cbAltL.Click += ModifierChanged;
+            cbAltL.CheckedChanged += ModifierChanged;
             // 
             // cbWinL
             // 
@@ -146,7 +146,7 @@
             cbWinL.TabIndex = 1;
             cbWinL.Text = "Left WIN";
             cbWinL.UseVisualStyleBackColor = true;
-            cbWinL.Click += ModifierChanged;
+            cbWinL.CheckedChanged += ModifierChanged;
             // 
             // cbCtrlR
             // 
@@ -158,7 +158,7 @@
             cbCtrlR.TabIndex = 1;
             cbCtrlR.Text = "Right CTRL";
             cbCtrlR.UseVisualStyleBackColor = true;
-            cbCtrlR.Click += ModifierChanged;
+            cbCtrlR.CheckedChanged += ModifierChanged;
             // 
             // button1
             // 

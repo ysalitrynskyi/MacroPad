@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using RSoft.MacroPad.BLL.Infrasturture.Model;
+using RSoft.MacroPad.BLL.Infrasturture.Protocol.Mappers;
 using RSoft.MacroPad.Infrastructure;
 
 namespace RSoft.MacroPad.Forms
@@ -16,6 +17,7 @@ namespace RSoft.MacroPad.Forms
     {
         public VirtualKey keySelected { get; private set; }
         public Modifier modifier = Modifier.None;
+        private bool _updating;
 
         public Modifier Modifier
         {
@@ -31,7 +33,12 @@ namespace RSoft.MacroPad.Forms
         {
             InitializeComponent();
 
-            listBox1.DataSource = System.Enum.GetValues(typeof(VirtualKey));
+            // Only the keys a keypad can actually send
+            listBox1.DataSource = System.Enum.GetValues(typeof(KeyCode)).Cast<KeyCode>()
+                .Where(k => k != KeyCode.None)
+                .Select(k => k.Map())
+                .Distinct()
+                .ToList();
 
             cbShiftL.Tag = Modifier.LeftShift;
             cbShiftR.Tag = Modifier.RightShift;
@@ -47,14 +54,18 @@ namespace RSoft.MacroPad.Forms
 
         private void UpdateControls()
         {
+            _updating = true;
             foreach (var item in gbModifiers.Controls.As<CheckBox>())
             {
                 item.Checked = ((Modifier)item.Tag & modifier) != Modifier.None;
             }
+            _updating = false;
         }
 
         private void ModifierChanged(object sender, EventArgs e)
         {
+            if (_updating)
+                return;
             var result = Modifier.None;
 
             foreach (var item in gbModifiers.Controls.As<CheckBox>())
