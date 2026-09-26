@@ -121,3 +121,11 @@ Layout: 3 buttons 1 knob (SIDE-KEYBOARD)
 	B2,25,5
 	B3,45,5
 	K1,70,5
+
+Layout: 4 buttons
+	4489:34960
+	1:5:0:0:3
+	B1,5,5
+	B2,25,5
+	B3,45,5
+	B4,65,5
